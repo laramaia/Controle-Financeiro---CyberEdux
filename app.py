@@ -146,32 +146,46 @@ def visualizar_grafico_rendimento():
     st.subheader("Rendimentos semanais")
     if not st.session_state["rendimentos"]:
         st.warning("Nenhum rendimento cadastrado")
-        return 0.0
+        return
     
     rendimentos = st.session_state["rendimentos"]
     # Ordena rendimentos pela data
-    rendimentos.sort(key=lambda rendimento: rendimento["data"])
+    rendimentos.sort(key=lambda x: datetime.strptime(x["data"], "%d/%m/%Y"))
 
-    semanas = {}
-    primeira_data = datetime.strptime(rendimento[0]["data"])
-
+    rendimentos_por_quinzena = {}
+    
     for rendimento in rendimentos:
-        data = datetime.strptime(rendimento["data"])
-        # Retorna semana ao subtrair data atual da mais antiga e dividir por 7 (semana inicia com 1)
-        semana = ((data - primeira_data).days // 7) + 1 
-        # Se semana atual não estiver no dicionário, inicializa chave com valor 0
-        if semana not in semanas:
-            semanas[semana] = 0
-        semanas[semana] += rendimento["valor"]  
-
-    for semana in sorted(semanas.keys()):
-        # Mostra respectivamente a chave (índice) da semana e o valor do dicionário
-        plt.bar(f"Semana {semana}", semanas[semana]) 
-
-    plt.title("Rendimentos semanais")
-    plt.xlabel("Semanas")
-    plt.ylabel("Valores (R$)")
-
+        data_rendimento = datetime.strptime(rendimento["data"], "%d/%m/%Y")
+        
+        # Define a quinzena
+        # Se o dia for 1-15, é a primeira quinzena, se for 16 até o final do mês, é a segunda quinzena
+        if data_rendimento.day <= 15:
+            quinzena = f"1ª quinzena {data_rendimento.strftime('%m/%Y')}"
+        else:
+            quinzena = f"2ª quinzena {data_rendimento.strftime('%m/%Y')}"
+        
+        valor = rendimento["valor"]
+        
+        # Soma os rendimentos na quinzena correspondente
+        if quinzena in rendimentos_por_quinzena:
+            rendimentos_por_quinzena[quinzena] += valor
+        else:
+            rendimentos_por_quinzena[quinzena] = valor
+    
+    # Organiza as quinzenas para exibir no gráfico
+    quinzenas = sorted(rendimentos_por_quinzena.keys())
+    valores_rendimento = [rendimentos_por_quinzena[quinzena] for quinzena in quinzenas]
+    
+    # Criar o gráfico
+    plt.figure(figsize=(10, 6))
+    plt.bar(quinzenas, valores_rendimento, color="green", alpha=0.7)
+    
+    # Adicionar títulos e rótulos ao gráfico
+    plt.xlabel("Quinzenas")
+    plt.ylabel("Valor (R$)")
+    plt.title("Rendimentos Quinzenais")
+    plt.xticks(rotation=45)
+    
     st.pyplot(plt)
 
 
