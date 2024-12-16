@@ -203,7 +203,67 @@ def visualizar_grafico_despesa():
     plt.ylabel("Valor total (R$)")
 
     st.pyplot(plt)
+
+def visualizar_grafico_meta_vs_rendimento():
+    st.subheader("Comparação: Meta vs Rendimento por Mês")
     
+    if not st.session_state["metas"]:
+        st.warning("Nenhuma meta cadastrada.")
+        return
+    
+    if not st.session_state["rendimentos"]:
+        st.warning("Nenhum rendimento cadastrado.")
+        return
+
+    # Obter as metas
+    metas = st.session_state["metas"]
+    
+    # Ordenar metas por data
+    metas.sort(key=lambda meta: datetime.strptime(meta["data"], "%d/%m/%Y"))
+    
+    # Dicionário para armazenar os rendimentos por mês
+    rendimentos_por_mes = {}
+    for rendimento in st.session_state["rendimentos"]:
+        data_rendimento = datetime.strptime(rendimento["data"], "%d/%m/%Y")
+        mes_ano = data_rendimento.strftime("%m/%Y")  # formato mês/ano
+        if mes_ano in rendimentos_por_mes:
+            rendimentos_por_mes[mes_ano] += rendimento["valor"]
+        else:
+            rendimentos_por_mes[mes_ano] = rendimento["valor"]
+    
+    # Dicionário para armazenar as metas por mês
+    metas_por_mes = {}
+    for meta in metas:
+        data_meta = datetime.strptime(meta["data"], "%d/%m/%Y")
+        mes_ano = data_meta.strftime("%m/%Y")
+        metas_por_mes[mes_ano] = meta["valor"]
+
+    # Definir os meses que serão exibidos no gráfico
+    meses = sorted(set(rendimentos_por_mes.keys()).union(set(metas_por_mes.keys())))
+    
+    # Preparar as listas de valores para o gráfico
+    valores_rendimento = [rendimentos_por_mes.get(mes, 0.0) for mes in meses]
+    valores_meta = [metas_por_mes.get(mes, 0.0) for mes in meses]
+    
+    # Gerar o gráfico
+    plt.figure(figsize=(10, 6))
+    plt.bar(meses, valores_meta, alpha=0.5, label="Meta", color="blue")
+    plt.bar(meses, valores_rendimento, alpha=0.7, label="Rendimento", color="green")
+    
+    # Adicionar linha horizontal indicando que a meta foi atingida
+    for i, mes in enumerate(meses):
+        if valores_rendimento[i] >= valores_meta[i]:
+            plt.text(mes, valores_rendimento[i] + 50, '✔️', ha='center', va='bottom', fontsize=12, color='green')
+        else:
+            plt.text(mes, valores_rendimento[i] + 50, '❌', ha='center', va='bottom', fontsize=12, color='red')
+    
+    plt.xlabel("Meses")
+    plt.ylabel("Valor (R$)")
+    plt.title("Comparação entre Meta e Rendimento por Mês")
+    plt.xticks(rotation=45)
+    plt.legend()
+
+    st.pyplot(plt)
 
 st.title("Você no Comando - Controle Financeiro para Autônomos")
 menu = st.sidebar.selectbox("Selecione uma opção", ["Cadastrar Rendimento", "Cadastrar Despesa", "Cadastrar Imposto", "Cadastrar Meta", "Visualizar Dados"])
@@ -220,5 +280,7 @@ elif menu == "Visualizar Dados":
     visualizar_ou_excluir_rendimentos()
     visualizar_ou_excluir_despesas()
     visualizar_ou_excluir_impostos()
+elif menu == "Visualizar Gráficos":
     visualizar_grafico_rendimento()
     visualizar_grafico_despesa()
+    visualizar_grafico_meta_vs_rendimento() 
