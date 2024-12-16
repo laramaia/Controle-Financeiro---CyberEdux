@@ -1,7 +1,7 @@
 import streamlit as st
 from datetime import datetime
 import pandas as pd
-import matplotlib.plotly as plt
+import matplotlib.pyplot as plt
 
 if "rendimentos" not in st.session_state:
     st.session_state["rendimentos"] = []
