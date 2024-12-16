@@ -126,7 +126,7 @@ def visualizar_ou_excluir_impostos():
                 #st.experimental_rerun()
 
 
-def visualizar_gráfico_rendimento():
+def visualizar_grafico_rendimento():
     st.subheader("Rendimentos semanais")
     if not st.session_state["rendimentos"]:
         st.warning("Nenhum rendimento cadastrado")
@@ -157,6 +157,36 @@ def visualizar_gráfico_rendimento():
     plt.ylabel("Valores (R$)")
 
     st.pyplot(plt)
+
+
+def visualizar_grafico_despesa():
+    despesas = st.session_state["despesas"]
+
+    if not despesas:
+        st.warning("Nenhuma despesa cadastrada.")
+        return 0.0
+    
+    # Dicionário que vai guardar a origem e seu respectivo gasto total
+    analise_das_origens = {}
+
+    for despesa in despesas:
+        origem = despesa["origem"]
+        valor = despesa["valor"]
+
+        if origem in analise_das_origens:
+            analise_das_origens[origem] += valor
+
+        else:
+            analise_das_origens[origem] = valor
+    
+    for origem, valor in analise_das_origens.items():
+        plt.bar(origem, analise_das_origens[origem])
+
+    plt.title("Análise de despesas")
+    plt.xlabel("Origem")
+    plt.ylabel("Valor total (R$)")
+
+    st.pyplot(plt)
     
 
 st.title("Você no Comando - Controle Financeiro para Autônomos")
@@ -172,4 +202,5 @@ elif menu == "Visualizar Dados":
     visualizar_ou_excluir_rendimentos()
     visualizar_ou_excluir_despesas()
     visualizar_ou_excluir_impostos()
-    visualizar_gráfico_rendimento()
+    visualizar_grafico_rendimento()
+    visualizar_grafico_despesa()
