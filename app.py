@@ -9,6 +9,8 @@ if "despesas" not in st.session_state:
     st.session_state["despesas"] = []
 if "impostos" not in st.session_state:
     st.session_state["impostos"] = []
+if "metas" not in st.session_state:
+    st.session_state["metas"] = []
 
 def formatar_data_brasil(data):
     meses = ["janeiro", "fevereiro", "março", "abril", "maio", "junho", "julho", "agosto", "setembro", "outubro", "novembro", "dezembro"]
@@ -74,6 +76,20 @@ def cadastro_impostos():
         novo_imposto = {"nome": nome, "data": data_formatada, "valor": valor, "vencimento": vencimento, }
         st.session_state["impostos"].append(novo_imposto)
         st.success(f'Imposto de {valor_formatado} adicionado com sucesso para {data_formatada}')
+
+def definir_meta():
+    st.subheader("Defina uma meta de rendimento para melhor controle financeiro!")
+    data_meta = st.date_input("Data da meta", value=datetime.now(), format="DD/MM/YYYY")
+    data_meta_formatada = formatar_data_brasil(data_meta)
+    valor_meta = st.number_input("Valor da Meta", min_value=0.0)
+    if valor_meta == 0.0:
+        st.error("O campo 'Valor' não pode estar vazio.")
+    valor_meta_formatado = formatar_valor_brasil(valor_meta)
+    st.text(f"Valor formatado: {valor_meta_formatado}")
+    if st.button("Adicionar Meta"):
+        nova_meta = {"data": data_meta_formatada, "valor": valor_meta_formatado}
+        st.session_state["metas"].append(nova_meta)
+        st.success(f'Meta adicionada com sucesso!')
 
 
 def visualizar_ou_excluir_rendimentos():
@@ -198,6 +214,8 @@ elif menu == "Cadastrar Despesa":
     cadastro_despesas()
 elif menu == "Cadastrar Imposto":
     cadastro_impostos()
+elif menu == "Cadastrar Meta":
+    definir_meta()
 elif menu == "Visualizar Dados":
     visualizar_ou_excluir_rendimentos()
     visualizar_ou_excluir_despesas()
