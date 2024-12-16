@@ -153,10 +153,10 @@ def visualizar_grafico_rendimento():
     rendimentos.sort(key=lambda rendimento: rendimento["data"])
 
     semanas = {}
-    primeira_data = rendimentos[0]["data"]
+    primeira_data = datetime.strptime(rendimento[0]["data"])
 
     for rendimento in rendimentos:
-        data = rendimento["data"]
+        data = datetime.strptime(rendimento["data"])
         # Retorna semana ao subtrair data atual da mais antiga e dividir por 7 (semana inicia com 1)
         semana = ((data - primeira_data).days // 7) + 1 
         # Se semana atual não estiver no dicionário, inicializa chave com valor 0
