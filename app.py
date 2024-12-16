@@ -1,6 +1,7 @@
 import streamlit as st
 from datetime import datetime
 import pandas as pd
+import matplotlib.plotly as plt
 
 if "rendimentos" not in st.session_state:
     st.session_state["rendimentos"] = []
@@ -127,3 +128,4 @@ elif menu == "Cadastrar Despesa":
 elif menu == "Visualizar Dados":
     visualizar_ou_excluir_rendimentos()
     visualizar_ou_excluir_despesas()
+    visualizar_gráfico_rendimento()
