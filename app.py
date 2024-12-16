@@ -280,7 +280,7 @@ def visualizar_grafico_meta_vs_rendimento():
     st.pyplot(plt)
 
 st.title("Você no Comando - Controle Financeiro para Autônomos")
-menu = st.sidebar.selectbox("Selecione uma opção", ["Cadastrar Rendimento", "Cadastrar Despesa", "Cadastrar Imposto", "Cadastrar Meta", "Visualizar Dados"])
+menu = st.sidebar.selectbox("Selecione uma opção", ["Cadastrar Rendimento", "Cadastrar Despesa", "Cadastrar Imposto", "Cadastrar Meta", "Visualizar Dados", "Visualizar Gráficos"])
 
 if menu == "Cadastrar Rendimento":
     cadastro_rendimentos()
