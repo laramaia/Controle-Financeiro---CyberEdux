@@ -206,7 +206,7 @@ def visualizar_grafico_despesa():
     
 
 st.title("Você no Comando - Controle Financeiro para Autônomos")
-menu = st.sidebar.selectbox("Selecione uma opção", ["Cadastrar Rendimento", "Cadastrar Despesa", "Cadastrar Imposto", "Visualizar Dados"])
+menu = st.sidebar.selectbox("Selecione uma opção", ["Cadastrar Rendimento", "Cadastrar Despesa", "Cadastrar Imposto", "Cadastrar Meta", "Visualizar Dados"])
 
 if menu == "Cadastrar Rendimento":
     cadastro_rendimentos()
