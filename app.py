@@ -77,6 +77,7 @@ def cadastro_impostos():
         st.session_state["impostos"].append(novo_imposto)
         st.success(f'Imposto de {valor_formatado} adicionado com sucesso para {data_formatada}')
 
+
 def definir_meta():
     st.subheader("Defina uma meta de rendimento para melhor controle financeiro!")
     data_meta = st.date_input("Data da meta", value=datetime.now(), format="DD/MM/YYYY")
@@ -209,9 +210,10 @@ def visualizar_grafico_despesa():
 
     st.pyplot(plt)
     plt.clf()
+    
 
 def visualizar_grafico_meta_vs_rendimento():
-    st.subheader("Comparação: Meta vs Rendimento por Mês")
+    st.subheader("Comparação: Rendimento vs Meta por Quinzena")
     
     if not st.session_state["metas"]:
         st.warning("Nenhuma meta cadastrada.")
@@ -225,51 +227,57 @@ def visualizar_grafico_meta_vs_rendimento():
     metas = st.session_state["metas"]
     
     # Ordenar metas por data
-    metas.sort(key=lambda meta: datetime.strptime(meta["data"], "%d/%m/%Y"))
+    metas.sort(key=lambda meta: meta["data"])
     
-    # Dicionário para armazenar os rendimentos por mês
-    rendimentos_por_mes = {}
+    # Dicionário para armazenar os rendimentos por quinzena
+    rendimentos_por_quinzena = {}
     for rendimento in st.session_state["rendimentos"]:
-        data_rendimento = datetime.strptime(rendimento["data"], "%d/%m/%Y")
+        data_rendimento = rendimento["data"]
         mes_ano = data_rendimento.strftime("%m/%Y")  # formato mês/ano
-        if mes_ano in rendimentos_por_mes:
-            rendimentos_por_mes[mes_ano] += rendimento["valor"]
+        if mes_ano in rendimentos_por_quinzena:
+            rendimentos_por_quinzena[mes_ano] += rendimento["valor"]
         else:
-            rendimentos_por_mes[mes_ano] = rendimento["valor"]
+            rendimentos_por_quinzena[mes_ano] = rendimento["valor"]
     
-    # Dicionário para armazenar as metas por mês
-    metas_por_mes = {}
+    # Dicionário para armazenar as metas por quinzena
+    metas_por_quinzena = {}
     for meta in metas:
-        data_meta = datetime.strptime(meta["data"], "%d/%m/%Y")
+        data_meta = meta["data"]
+        dia = data_meta.day
         mes_ano = data_meta.strftime("%m/%Y")
-        metas_por_mes[mes_ano] = meta["valor"]
+        if dia <= 15:
+            quinzena = f"1ª Quinzena/{mes_ano}"
+        else:
+            quinzena = f"2ª Quinzena/{mes_ano}"
+        
+        metas_por_quinzena[quinzena] = meta["valor"]
 
     # Definir os meses que serão exibidos no gráfico
-    meses = sorted(set(rendimentos_por_mes.keys()).union(set(metas_por_mes.keys())))
+    quinzenas = sorted(set(rendimentos_por_quinzena.keys()).union(set(metas_por_quinzena.keys())))
     
     # Preparar as listas de valores para o gráfico
-    valores_rendimento = [rendimentos_por_mes.get(mes, 0.0) for mes in meses]
-    valores_meta = [metas_por_mes.get(mes, 0.0) for mes in meses]
+    valores_rendimento = [rendimentos_por_quinzena.get(quinzena, 0.0) for quinzena in quinzenas]
+    valores_meta = [metas_por_quinzena.get(quinzena, 0.0) for quinzena in quinzenas]
     
     # Gerar o gráfico
     plt.figure(figsize=(10, 6))
-    plt.bar(meses, valores_meta, alpha=0.5, label="Meta", color="blue")
-    plt.bar(meses, valores_rendimento, alpha=0.7, label="Rendimento", color="green")
     
     # Adicionar linha horizontal indicando que a meta foi atingida
-    for i, mes in enumerate(meses):
+    for i, quinzena in enumerate(quinzenas):
+        plt.bar(quinzena, valores_meta[i], alpha=0.5, label="Meta" if i == 0 else "", color="blue")
+        plt.bar(quinzena, valores_rendimento[i], alpha=0.7, label="Rendimento" if i == 0 else "", color="green")
         if valores_rendimento[i] >= valores_meta[i]:
-            plt.text(mes, valores_rendimento[i] + 50, '✔️', ha='center', va='bottom', fontsize=12, color='green')
+            plt.text(quinzena, valores_rendimento[i] + 50, '✔️', ha='center', va='bottom', fontsize=12, color='green')
         else:
-            plt.text(mes, valores_rendimento[i] + 50, '❌', ha='center', va='bottom', fontsize=12, color='red')
+            plt.text(quinzena, valores_rendimento[i] + 50, '❌', ha='center', va='bottom', fontsize=12, color='red')
     
-    plt.xlabel("Meses")
+    plt.xlabel("Quinzenas")
     plt.ylabel("Valor (R$)")
     plt.title("Comparação entre Meta e Rendimento por Mês")
-    plt.xticks(rotation=45)
     plt.legend()
 
     st.pyplot(plt)
+
 
 st.title("Você no Comando - Controle Financeiro para Autônomos")
 menu = st.sidebar.selectbox("Selecione uma opção", ["Cadastrar Rendimento", "Cadastrar Despesa", "Cadastrar Imposto", "Cadastrar Meta", "Visualizar Dados", "Visualizar Gráficos"])
