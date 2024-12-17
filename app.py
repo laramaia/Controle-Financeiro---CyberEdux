@@ -168,7 +168,7 @@ def visualizar_grafico_rendimento():
     # Organiza as quinzenas para exibir no gráfico
     for quinzena in sorted(quinzenas.keys()):
         # Mostra respectivamente a chave (índice) da quinzena e o valor do dicionário
-        plt.bar(f"Quinzena {quinzena}", quinzenas[quinzena]) 
+        plt.bar(f"Quinzena {quinzena}", quinzenas[quinzena], color="blue") 
     
     # Adicionar títulos e rótulos ao gráfico
     plt.xlabel("Quinzenas")
@@ -203,7 +203,7 @@ def visualizar_grafico_despesa():
     origens = list(analise_das_origens.keys())
     valores = list(analise_das_origens.values())
 
-    plt.bar(origens, valores)
+    plt.bar(origens, valores, color="blue")
     plt.title("Análise de despesas")
     plt.xlabel("Origem")
     plt.ylabel("Valor total (R$)")
