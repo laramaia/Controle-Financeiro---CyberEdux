@@ -72,7 +72,7 @@ def cadastro_impostos():
     vencimento = st.text_input("Data de vencimento do imposto")
     if not vencimento.strip():
         st.error("O campo 'Vencimento' não pode estar vazio.")
-    if st.button("Adicionar Rendimento"):
+    if st.button("Adicionar Imposto"):
         novo_imposto = {"nome": nome, "data": data_formatada, "valor": valor, "vencimento": vencimento, }
         st.session_state["impostos"].append(novo_imposto)
         st.success(f'Imposto de {valor_formatado} adicionado com sucesso para {data_formatada}')
