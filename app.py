@@ -176,6 +176,7 @@ def visualizar_grafico_rendimento():
     plt.xticks(rotation=45)
     
     st.pyplot(plt)
+    plt.clf()
 
 
 def visualizar_grafico_despesa():
@@ -198,14 +199,16 @@ def visualizar_grafico_despesa():
         else:
             analise_das_origens[origem] = valor
     
-    for origem, valor in analise_das_origens.items():
-        plt.bar(origem, analise_das_origens[origem])
+    origens = list(analise_das_origens.keys())
+    valores = list(analise_das_origens.values())
 
+    plt.bar(origens, valores)
     plt.title("Análise de despesas")
     plt.xlabel("Origem")
     plt.ylabel("Valor total (R$)")
 
     st.pyplot(plt)
+    plt.clf()
 
 def visualizar_grafico_meta_vs_rendimento():
     st.subheader("Comparação: Meta vs Rendimento por Mês")
