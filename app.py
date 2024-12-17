@@ -34,7 +34,7 @@ def cadastro_rendimentos():
     if not origem.strip():
         st.error("O campo 'Origem' não pode estar vazio.")
     if st.button("Adicionar Rendimento"):
-        novo_rendimento = {"data": data_formatada, "valor": valor, "origem": origem}
+        novo_rendimento = {"data": data, "valor": valor, "origem": origem}
         st.session_state["rendimentos"].append(novo_rendimento)
         st.success(f'Rendimento de {valor_formatado} adicionado com sucesso para {data_formatada}')
 
@@ -146,39 +146,28 @@ def visualizar_grafico_rendimento():
     st.subheader("Rendimentos semanais")
     if not st.session_state["rendimentos"]:
         st.warning("Nenhum rendimento cadastrado")
-        return
+        return 0.0
     
     rendimentos = st.session_state["rendimentos"]
     # Ordena rendimentos pela data
-    rendimentos.sort(key=lambda x: datetime.strptime(x["data"], "%d/%m/%Y"))
+    rendimentos.sort(key=lambda rendimento: rendimento["data"])
 
-    rendimentos_por_quinzena = {}
-    
+    quinzenas = {}
+    primeira_data = rendimentos[0]["data"]
+
     for rendimento in rendimentos:
-        data_rendimento = datetime.strptime(rendimento["data"], "%d/%m/%Y")
-        
-        # Define a quinzena
-        # Se o dia for 1-15, é a primeira quinzena, se for 16 até o final do mês, é a segunda quinzena
-        if data_rendimento.day <= 15:
-            quinzena = f"1ª quinzena {data_rendimento.strftime('%m/%Y')}"
-        else:
-            quinzena = f"2ª quinzena {data_rendimento.strftime('%m/%Y')}"
-        
-        valor = rendimento["valor"]
-        
-        # Soma os rendimentos na quinzena correspondente
-        if quinzena in rendimentos_por_quinzena:
-            rendimentos_por_quinzena[quinzena] += valor
-        else:
-            rendimentos_por_quinzena[quinzena] = valor
+        data = rendimento["data"]
+        # Retorna quinzena ao subtrair data atual da mais antiga e dividir por 15 (inicia com 1)
+        quinzena = ((data - primeira_data).days // 15) + 1 
+        # Se quinzena atual não estiver no dicionário, inicializa chave com valor 0
+        if quinzena not in quinzenas:
+            quinzenas[quinzena] = 0
+        quinzenas[quinzena] += rendimento["valor"]  
     
     # Organiza as quinzenas para exibir no gráfico
-    quinzenas = sorted(rendimentos_por_quinzena.keys())
-    valores_rendimento = [rendimentos_por_quinzena[quinzena] for quinzena in quinzenas]
-    
-    # Criar o gráfico
-    plt.figure(figsize=(10, 6))
-    plt.bar(quinzenas, valores_rendimento, color="green", alpha=0.7)
+    for quinzena in sorted(quinzenas.keys()):
+        # Mostra respectivamente a chave (índice) da quinzena e o valor do dicionário
+        plt.bar(f"Quinzena {quinzena}", quinzenas[quinzena]) 
     
     # Adicionar títulos e rótulos ao gráfico
     plt.xlabel("Quinzenas")
