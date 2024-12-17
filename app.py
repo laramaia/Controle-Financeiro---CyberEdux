@@ -137,7 +137,7 @@ def visualizar_ou_excluir_impostos():
         with col4:
             st.write(f"**Nome:** {imposto['nome']}")
         with col5:
-            if st.button("Excluir", key=f'delete_rend_{i}'):
+            if st.button("Excluir", key=f'delete_impo_{i}'):
                 st.session_state["impostos"].pop(i)
                 #st.experimental_rerun()
 
@@ -289,4 +289,4 @@ elif menu == "Visualizar Dados":
 elif menu == "Visualizar Gráficos":
     visualizar_grafico_rendimento()
     visualizar_grafico_despesa()
-    visualizar_grafico_meta_vs_rendimento() 
+    visualizar_grafico_meta_vs_rendimento()
