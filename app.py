@@ -144,7 +144,7 @@ def visualizar_ou_excluir_impostos():
 
 
 def visualizar_grafico_rendimento():
-    st.subheader("Rendimentos semanais")
+    st.subheader("Rendimentos quinzenais")
     if not st.session_state["rendimentos"]:
         st.warning("Nenhum rendimento cadastrado")
         return 0.0
@@ -181,6 +181,7 @@ def visualizar_grafico_rendimento():
 
 
 def visualizar_grafico_despesa():
+    st.subheader("Despesas quinzenais")
     despesas = st.session_state["despesas"]
 
     if not despesas:
