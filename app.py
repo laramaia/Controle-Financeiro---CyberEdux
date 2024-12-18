@@ -1,6 +1,6 @@
 import streamlit as st
 from datetime import datetime
-import pandas as pd
+#import pandas as pd
 import matplotlib.pyplot as plt
 
 if "rendimentos" not in st.session_state:
@@ -278,6 +278,39 @@ def visualizar_grafico_meta_vs_rendimento():
 
     st.pyplot(plt)
 
+def visualizar_grafico_lucro():
+    st.subheader("Lucro Quinzenal")
+    
+    if not st.session_state["rendimentos"]:
+        st.warning("Nenhum rendimento cadastrado.")
+        return
+    if not st.session_state["despesas"]:
+        st.warning("Nenhuma despesa cadastrada.")
+    if not st.session_state["impostos"]:
+        st.warning("Nenhum imposto cadastrado.")
+
+    rendimentos = st.session_state["rendimentos"]
+    despesas = st.session_state["despesas"]
+    impostos = st.session_state["impostos"]
+
+ 
+    lucro = 0
+    for rendimento in rendimentos:
+        lucro += rendimento["valor"]
+
+    for despesa in despesas:
+        lucro -= despesa["valor"]
+
+    for imposto in impostos:
+        lucro -= imposto["valor"]
+
+   
+    plt.figure(figsize=(10, 6))
+    plt.bar(["Lucro"], [lucro], color="blue")
+    plt.ylabel("Lucro (R$)")
+    plt.title("Lucro Total")
+    st.pyplot(plt)
+    plt.clf()
 
 st.title("Você no Comando - Controle Financeiro para Autônomos")
 menu = st.sidebar.selectbox("Selecione uma opção", ["Cadastrar Rendimento", "Cadastrar Despesa", "Cadastrar Imposto", "Cadastrar Meta", "Visualizar Dados", "Visualizar Gráficos"])
@@ -298,3 +331,4 @@ elif menu == "Visualizar Gráficos":
     visualizar_grafico_rendimento()
     visualizar_grafico_despesa()
     visualizar_grafico_meta_vs_rendimento()
+    visualizar_grafico_lucro()
