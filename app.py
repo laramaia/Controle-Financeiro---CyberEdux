@@ -128,7 +128,7 @@ def visualizar_ou_excluir_despesas():
 def visualizar_ou_excluir_impostos():
     st.subheader("Seus Impostos")
     for i, imposto in enumerate(st.session_state["impostos"]):
-        col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 2, 1])
+        col1, col2, col3, col4, col5 = st.columns([2, 2, 2, 2, 2])
         with col1:
             st.write(f"**Valor:** {imposto['valor']}")
         with col2:
