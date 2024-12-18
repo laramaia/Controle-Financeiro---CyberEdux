@@ -1,7 +1,15 @@
 import streamlit as st
 from datetime import datetime
-#import pandas as pd
 import matplotlib.pyplot as plt
+
+st.set_page_config(
+    page_title="Você no Controle", page_icon=":bar_chart:"
+)
+
+st.title("Você no Controle - Controle Financeiro para Autônomos")
+st.subheader("Você no Controle: Simplificando a gestão das suas finanças!")
+st.write("O programa tem como objetivo ajudar você a entender e gerenciar suas finanças para tomada de decisões mais conscientes.")
+st.write("Desenvolvido por Lara Caroline, Raquel Arantes e Maria Eduarda de Gouveia.")
 
 if "rendimentos" not in st.session_state:
     st.session_state["rendimentos"] = []
@@ -150,7 +158,6 @@ def visualizar_grafico_rendimento():
         return 0.0
     
     rendimentos = st.session_state["rendimentos"]
-    # Ordena rendimentos pela data
     rendimentos.sort(key=lambda rendimento: rendimento["data"])
 
     quinzenas = {}
@@ -158,19 +165,17 @@ def visualizar_grafico_rendimento():
 
     for rendimento in rendimentos:
         data = rendimento["data"]
-        # Retorna quinzena ao subtrair data atual da mais antiga e dividir por 15 (inicia com 1)
         quinzena = ((data - primeira_data).days // 15) + 1 
-        # Se quinzena atual não estiver no dicionário, inicializa chave com valor 0
         if quinzena not in quinzenas:
             quinzenas[quinzena] = 0
         quinzenas[quinzena] += rendimento["valor"]  
     
-    # Organiza as quinzenas para exibir no gráfico
+    
     for quinzena in sorted(quinzenas.keys()):
-        # Mostra respectivamente a chave (índice) da quinzena e o valor do dicionário
+        
         plt.bar(f"Quinzena {quinzena}", quinzenas[quinzena], color="blue") 
     
-    # Adicionar títulos e rótulos ao gráfico
+    
     plt.xlabel("Quinzenas")
     plt.ylabel("Valor (R$)")
     plt.title("Rendimentos Quinzenais")
@@ -188,7 +193,7 @@ def visualizar_grafico_despesa():
         st.warning("Nenhuma despesa cadastrada.")
         return 0.0
     
-    # Dicionário que vai guardar a origem e seu respectivo gasto total
+    
     analise_das_origens = {}
 
     for despesa in despesas:
@@ -224,13 +229,13 @@ def visualizar_grafico_meta_vs_rendimento():
         st.warning("Nenhum rendimento cadastrado.")
         return
 
-    # Obter as metas
+    
     metas = st.session_state["metas"]
     
-    # Dicionário para armazenar as metas por quinzena
+    
     metas_por_quinzena = {}
     for meta in metas:
-        # Converter string de data para objeto datetime
+        
         data_meta = datetime.strptime(meta["data"].split()[0], "%d/%m/%Y")
         dia = data_meta.day
         mes_ano = data_meta.strftime("%m/%Y")
@@ -239,28 +244,28 @@ def visualizar_grafico_meta_vs_rendimento():
         else:
             quinzena = f"2ª Quinzena/{mes_ano}"
         
-        # Garantir que o valor da meta seja tratado como numérico
+        
         valor_meta = float(meta["valor"].replace("R$", "").replace(".", "").replace(",", "."))
         metas_por_quinzena[quinzena] = valor_meta
 
-    # Dicionário para armazenar os rendimentos por quinzena
+    
     rendimentos_por_quinzena = {}
     for rendimento in st.session_state["rendimentos"]:
         data_rendimento = rendimento["data"]
-        mes_ano = data_rendimento.strftime("%m/%Y")  # formato mês/ano
+        mes_ano = data_rendimento.strftime("%m/%Y")  
         if mes_ano in rendimentos_por_quinzena:
             rendimentos_por_quinzena[mes_ano] += rendimento["valor"]
         else:
             rendimentos_por_quinzena[mes_ano] = rendimento["valor"]
     
-    # Definir as quinzenas que serão exibidas no gráfico
+    
     quinzenas = sorted(set(rendimentos_por_quinzena.keys()).union(set(metas_por_quinzena.keys())))
     
-    # Preparar as listas de valores para o gráfico
+    
     valores_rendimento = [rendimentos_por_quinzena.get(quinzena, 0.0) for quinzena in quinzenas]
     valores_meta = [metas_por_quinzena.get(quinzena, 0.0) for quinzena in quinzenas]
     
-    # Gerar o gráfico
+    
     plt.figure(figsize=(10, 6))
     
     for i, quinzena in enumerate(quinzenas):
@@ -312,21 +317,47 @@ def visualizar_grafico_lucro():
     st.pyplot(plt)
     plt.clf()
 
-st.title("Você no Comando - Controle Financeiro para Autônomos")
-menu = st.sidebar.selectbox("Selecione uma opção", ["Cadastrar Rendimento", "Cadastrar Despesa", "Cadastrar Imposto", "Cadastrar Meta", "Visualizar Dados", "Visualizar Gráficos"])
+menu = st.sidebar.selectbox(
+    "Selecione uma opção", 
+    [
+        "Página Inicial",
+        "Cadastrar Rendimento", 
+        "Cadastrar Despesa", 
+        "Cadastrar Imposto", 
+        "Cadastrar Meta", 
+        "Visualizar Dados", 
+        "Visualizar Gráficos"
+    ]
+)
 
-if menu == "Cadastrar Rendimento":
+
+if menu == "Página Inicial":
+    st.write("Bem-vindo ao **Você no Controle**!")
+    st.write("Use o menu lateral para navegar entre as funcionalidades do aplicativo.")
+
+
+elif menu == "Cadastrar Rendimento":
     cadastro_rendimentos()
+
+
 elif menu == "Cadastrar Despesa":
     cadastro_despesas()
+
+
 elif menu == "Cadastrar Imposto":
     cadastro_impostos()
+
+
 elif menu == "Cadastrar Meta":
     definir_meta()
+
+
 elif menu == "Visualizar Dados":
     visualizar_ou_excluir_rendimentos()
     visualizar_ou_excluir_despesas()
     visualizar_ou_excluir_impostos()
+
+
 elif menu == "Visualizar Gráficos":
     visualizar_grafico_rendimento()
     visualizar_grafico_despesa()
