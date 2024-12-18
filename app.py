@@ -226,9 +226,22 @@ def visualizar_grafico_meta_vs_rendimento():
     # Obter as metas
     metas = st.session_state["metas"]
     
-    # Ordenar metas por data
-    metas.sort(key=lambda meta: meta["data"])
-    
+    # Dicionário para armazenar as metas por quinzena
+    metas_por_quinzena = {}
+    for meta in metas:
+        # Converter string de data para objeto datetime
+        data_meta = datetime.strptime(meta["data"].split()[0], "%d/%m/%Y")
+        dia = data_meta.day
+        mes_ano = data_meta.strftime("%m/%Y")
+        if dia <= 15:
+            quinzena = f"1ª Quinzena/{mes_ano}"
+        else:
+            quinzena = f"2ª Quinzena/{mes_ano}"
+        
+        # Garantir que o valor da meta seja tratado como numérico
+        valor_meta = float(meta["valor"].replace("R$", "").replace(".", "").replace(",", "."))
+        metas_por_quinzena[quinzena] = valor_meta
+
     # Dicionário para armazenar os rendimentos por quinzena
     rendimentos_por_quinzena = {}
     for rendimento in st.session_state["rendimentos"]:
@@ -239,20 +252,7 @@ def visualizar_grafico_meta_vs_rendimento():
         else:
             rendimentos_por_quinzena[mes_ano] = rendimento["valor"]
     
-    # Dicionário para armazenar as metas por quinzena
-    metas_por_quinzena = {}
-    for meta in metas:
-        data_meta = meta["data"]
-        dia = data_meta.day
-        mes_ano = data_meta.strftime("%m/%Y")
-        if dia <= 15:
-            quinzena = f"1ª Quinzena/{mes_ano}"
-        else:
-            quinzena = f"2ª Quinzena/{mes_ano}"
-        
-        metas_por_quinzena[quinzena] = meta["valor"]
-
-    # Definir os meses que serão exibidos no gráfico
+    # Definir as quinzenas que serão exibidas no gráfico
     quinzenas = sorted(set(rendimentos_por_quinzena.keys()).union(set(metas_por_quinzena.keys())))
     
     # Preparar as listas de valores para o gráfico
@@ -262,18 +262,17 @@ def visualizar_grafico_meta_vs_rendimento():
     # Gerar o gráfico
     plt.figure(figsize=(10, 6))
     
-    # Adicionar linha horizontal indicando que a meta foi atingida
     for i, quinzena in enumerate(quinzenas):
         plt.bar(quinzena, valores_meta[i], alpha=0.5, label="Meta" if i == 0 else "", color="blue")
         plt.bar(quinzena, valores_rendimento[i], alpha=0.7, label="Rendimento" if i == 0 else "", color="green")
         if valores_rendimento[i] >= valores_meta[i]:
-            plt.text(quinzena, valores_rendimento[i] + 50, '✔️', ha='center', va='bottom', fontsize=12, color='green')
+            plt.text(i, valores_rendimento[i] + 50, '✔️', ha='center', va='bottom', fontsize=12, color='green')
         else:
-            plt.text(quinzena, valores_rendimento[i] + 50, '❌', ha='center', va='bottom', fontsize=12, color='red')
+            plt.text(i, valores_rendimento[i] + 50, '❌', ha='center', va='bottom', fontsize=12, color='red')
     
     plt.xlabel("Quinzenas")
     plt.ylabel("Valor (R$)")
-    plt.title("Comparação entre Meta e Rendimento por Mês")
+    plt.title("Comparação entre Meta e Rendimento por Quinzena")
     plt.legend()
 
     st.pyplot(plt)
