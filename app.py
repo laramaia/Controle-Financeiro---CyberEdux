@@ -179,7 +179,6 @@ def visualizar_grafico_rendimento():
     plt.xlabel("Quinzenas")
     plt.ylabel("Valor (R$)")
     plt.title("Rendimentos Quinzenais")
-    plt.xticks(rotation=45)
     
     st.pyplot(plt)
     plt.clf()
@@ -271,10 +270,6 @@ def visualizar_grafico_meta_vs_rendimento():
     for i, quinzena in enumerate(quinzenas):
         plt.bar(quinzena, valores_meta[i], alpha=0.5, label="Meta" if i == 0 else "", color="blue")
         plt.bar(quinzena, valores_rendimento[i], alpha=0.7, label="Rendimento" if i == 0 else "", color="green")
-        if valores_rendimento[i] >= valores_meta[i]:
-            plt.text(i, valores_rendimento[i] + 50, '✔️', ha='center', va='bottom', fontsize=12, color='green')
-        else:
-            plt.text(i, valores_rendimento[i] + 50, '❌', ha='center', va='bottom', fontsize=12, color='red')
     
     plt.xlabel("Quinzenas")
     plt.ylabel("Valor (R$)")
